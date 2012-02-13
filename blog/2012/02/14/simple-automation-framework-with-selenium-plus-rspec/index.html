@@ -9,7 +9,7 @@
   <meta name="author" content="Smart Huang">
 
   
-  <meta name="description" content="Simple Rspec + Selenium Framework Where is the framework this framework can be found in active&#8217;s Git repository Create Script from Selenium IDE &hellip;">
+  <meta name="description" content="Where is the framework this framework can be found in active&#8217;s Git repository Create Script from Selenium IDE Record a test case in Selenium &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,186 +90,186 @@
   </header>
 
 
-<div class="entry-content"><h1>Simple Rspec + Selenium Framework</h1>
-
-<h2>Where is the framework</h2>
+<div class="entry-content"><h2>Where is the framework</h2>
 
 <p>this framework can be found in active&#8217;s <a href="" title="http://git.dev.activenetwork.com/aw-automation/marquee-auto/">Git</a> repository</p>
 
 <h2>Create Script from Selenium IDE</h2>
 
+<p>Record a test case in <a href="http://seleniumhq.org/projects/ide/">Selenium IDE</a> for below scenarios</p>
+
 <ol>
-<li><p>Record a test case in <a href="http://seleniumhq.org/projects/ide/">Selenium IDE</a> for below scenarios</p>
-
-<blockquote><p>open browser and navigate to www.baidu.com</p>
-
-<p>input <em>test</em> into the search filed and press search button</p>
-
-<p>verify the text of <em>test</em> should present in the edit box</p>
-
-<p>click the search button again on the page</p></blockquote></li>
-<li><p>Export the testsuite with <strong>Ruby Rspec(WebDriver)</strong> to a .rb file <em>(name it export.rb for demo)</em></p>
-
-<pre><code>  require "selenium-webdriver"
-  require "rspec"
-  include RSpec::Expectations
-
-  describe "Test" do
-      before(:each) do
-          @driver = Selenium::WebDriver.for :firefox
-          @base_url = "http://www.baidu.com/"
-          @driver.manage.timeouts.implicit_wait = 30
-          @verification_errors = []
-      end
-
-      after(:each) do
-          @driver.quit
-          @verification_errors.should == []
-      end
-
-      it "test_" do
-          @driver.get(@base_url + "/")
-          @driver.find_element(:id, "kw").clear
-          @driver.find_element(:id, "kw").send_keys "test"
-          @driver.find_element(:id, "su").click
-          verify { (@driver.find_element(:id, "kw").attribute("value")).should == "test" }
-          @driver.find_element(:id, "su").click
-      end
-
-      def element_present?(how, what)
-          @driver.find_element(how, what)
-          true
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-          false
-      end
-
-      def verify(&amp;blk)
-          yield
-      rescue ExpectationNotMetError =&gt; ex
-          @verification_errors &lt;&lt; ex
-      end
-  end      
-</code></pre></li>
-<li><p>Create new test case file under <strong>testsuites</strong> folder <em>(name it as testcase.rb here)</em>, copy below codes into the file</p>
-
-<pre><code>  require "#{File.dirname(__FILE__)}/../common/initialize.rb"
-  require "selenium-webdriver"
-  describe "TestSuiteName" do
-      before(:all){
-          MARQUEE::update_script_state $round_id,$plan_name,"Start",""
-      }
-      after(:all){
-          MARQUEE::update_script_state $round_id,$plan_name,"End",""
-      }
-      before(:each) do
-          @driver = Selenium::WebDriver.for $browser.to_sym
-          @base_url = "UPDATE URL HERE"
-          @driver.manage.timeouts.implicit_wait = 30
-          @verification_errors = []
-      end
-      after(:each) do
-          @driver.quit
-          example.result!
-      end
-      def element_present?(how, what)
-          @driver.find_element(how, what)
-          true
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-          false
-      end
-
-      def verify(&amp;blk)
-          yield
-      rescue ExpectationNotMetError =&gt; ex
-          @verification_errors &lt;&lt; ex
-      end
-  end
-</code></pre></li>
-<li><p>Copy the code block it…do…end in <strong>export.rb</strong> to <strong>testcase.rb</strong></p></li>
-<li><p>Update the @base_url to your test url</p></li>
-<li><p>Update the string after it to your test case description. it should be <strong>TestCaseID + ## + TestCaseName</strong></p></li>
-<li><p>Your codes should looks like below</p>
-
-<pre><code>  require "#{File.dirname(__FILE__)}/../common/initialize.rb"
-
-  require "selenium-webdriver"
-
-  describe "TestSuiteName" do
-
-      it "CaseID_1##DescriptionOfTestCaseName" do
-          @driver.get(@base_url + "/")
-          @driver.find_element(:id, "kw").clear
-          @driver.find_element(:id, "kw").send_keys "test"
-          @driver.find_element(:id, "su").click
-          verify { (@driver.find_element(:id, "kw").attribute("value")).should == "test" }
-          @driver.find_element(:id, "su").click
-      end
-
-      before(:all){
-          MARQUEE::update_script_state $round_id,$plan_name,"Start",""
-      }
-      after(:all){
-          MARQUEE::update_script_state $round_id,$plan_name,"End",""
-      }
-      before(:each) do
-          @driver = Selenium::WebDriver.for $browser.to_sym
-          @base_url = "http://baidu.com"
-          @driver.manage.timeouts.implicit_wait = 30
-          @verification_errors = []
-      end
-      after(:each) do
-          @driver.quit
-          example.result!
-      end
-      def element_present?(how, what)
-          @driver.find_element(how, what)
-          true
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-          false
-      end
-
-      def verify(&amp;blk)
-          yield
-      rescue ExpectationNotMetError =&gt; ex
-          @verification_errors &lt;&lt; ex
-      end
-  end
-</code></pre></li>
-<li><p>The last step is adding some metadata for your test suite.</p>
-
-<blockquote><p>Adding below comments in your script file <strong>testcase.rb</strong></p></blockquote>
-
-<pre><code>  #####Ower--smart.huang@activenetwork.com
-
-  #####Status--completed
-
-  #####TimeOut--600  
-</code></pre></li>
+<li><p>open browser and navigate to www.baidu.com</p></li>
+<li><p>input <em>test</em> into the search filed and press search button</p></li>
+<li><p>verify the text of <em>test</em> should present in the edit box</p></li>
+<li><p>click the search button again on the page</p></li>
 </ol>
 
+
+<p>Export the testsuite with <strong>Ruby Rspec(WebDriver)</strong> to a .rb file <em>(name it export.rb for demo)</em></p>
+
+<pre><code>require "selenium-webdriver"
+require "rspec"
+include RSpec::Expectations
+
+describe "Test" do
+    before(:each) do
+        @driver = Selenium::WebDriver.for :firefox
+        @base_url = "http://www.baidu.com/"
+        @driver.manage.timeouts.implicit_wait = 30
+        @verification_errors = []
+    end
+
+    after(:each) do
+        @driver.quit
+        @verification_errors.should == []
+    end
+
+    it "test_" do
+        @driver.get(@base_url + "/")
+        @driver.find_element(:id, "kw").clear
+        @driver.find_element(:id, "kw").send_keys "test"
+        @driver.find_element(:id, "su").click
+        verify { (@driver.find_element(:id, "kw").attribute("value")).should == "test" }
+        @driver.find_element(:id, "su").click
+    end
+
+    def element_present?(how, what)
+        @driver.find_element(how, what)
+        true
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+        false
+    end
+
+    def verify(&amp;blk)
+        yield
+    rescue ExpectationNotMetError =&gt; ex
+        @verification_errors &lt;&lt; ex
+    end
+end      
+</code></pre>
+
+<p>Create new test case file under <strong>testsuites</strong> folder <em>(name it as testcase.rb here)</em>, copy below codes into the file</p>
+
+<pre><code>require "#{File.dirname(__FILE__)}/../common/initialize.rb"
+require "selenium-webdriver"
+describe "TestSuiteName" do
+    before(:all){
+        MARQUEE::update_script_state $round_id,$plan_name,"Start",""
+    }
+    after(:all){
+        MARQUEE::update_script_state $round_id,$plan_name,"End",""
+    }
+    before(:each) do
+        @driver = Selenium::WebDriver.for $browser.to_sym
+        @base_url = "UPDATE URL HERE"
+        @driver.manage.timeouts.implicit_wait = 30
+        @verification_errors = []
+    end
+    after(:each) do
+        @driver.quit
+        example.result!
+    end
+    def element_present?(how, what)
+        @driver.find_element(how, what)
+        true
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+        false
+    end
+
+    def verify(&amp;blk)
+        yield
+    rescue ExpectationNotMetError =&gt; ex
+        @verification_errors &lt;&lt; ex
+    end
+end
+</code></pre>
+
+<p>Copy the code block it…do…end in <strong>export.rb</strong> to <strong>testcase.rb</strong></p>
+
+<p>Update the @base_url to your test url</p>
+
+<p>Update the string after it to your test case description. it should be <strong>TestCaseID + ## + TestCaseName</strong></p>
+
+<p>Your codes should looks like below</p>
+
+<pre><code>require "#{File.dirname(__FILE__)}/../common/initialize.rb"
+
+require "selenium-webdriver"
+
+describe "TestSuiteName" do
+
+    it "CaseID_1##DescriptionOfTestCaseName" do
+        @driver.get(@base_url + "/")
+        @driver.find_element(:id, "kw").clear
+        @driver.find_element(:id, "kw").send_keys "test"
+        @driver.find_element(:id, "su").click
+        verify { (@driver.find_element(:id, "kw").attribute("value")).should == "test" }
+        @driver.find_element(:id, "su").click
+    end
+
+    before(:all){
+        MARQUEE::update_script_state $round_id,$plan_name,"Start",""
+    }
+    after(:all){
+        MARQUEE::update_script_state $round_id,$plan_name,"End",""
+    }
+    before(:each) do
+        @driver = Selenium::WebDriver.for $browser.to_sym
+        @base_url = "http://baidu.com"
+        @driver.manage.timeouts.implicit_wait = 30
+        @verification_errors = []
+    end
+    after(:each) do
+        @driver.quit
+        example.result!
+    end
+    def element_present?(how, what)
+        @driver.find_element(how, what)
+        true
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+        false
+    end
+
+    def verify(&amp;blk)
+        yield
+    rescue ExpectationNotMetError =&gt; ex
+        @verification_errors &lt;&lt; ex
+    end
+end
+</code></pre>
+
+<p>The last step is adding some metadata for your test suite.</p>
+
+<p>Adding below comments in your script file <strong>testcase.rb</strong></p>
+
+<pre><code>#####Ower--smart.huang@activenetwork.com
+
+#####Status--completed
+
+#####TimeOut--600  
+</code></pre>
 
 <h2>Update Your Script to Marquee</h2>
 
-<ol>
-<li>We had a ruby script <em>update_script_to_marquee.rb</em> to update all the test suites to Marquee</li>
-<li><p>The informations are coded in the comments of scripts</p>
+<p>We had a ruby script <em>update_script_to_marquee.rb</em> to update all the test suites to Marquee</p>
 
-<blockquote><p> Using below command to do the updating</p></blockquote>
+<p>The informations are coded in the comments of scripts</p>
 
-<pre><code> ruby update_script_to_marquee.rb
-</code></pre></li>
-</ol>
+<h2>Using below command to do the updating</h2>
 
+<pre><code>ruby update_script_to_marquee.rb
+</code></pre>
 
 <h2>Debug Your Script</h2>
 
 <p>To debug your script, you need to</p>
 
 <ol>
-<li>go to the test folder</li>
-<li><p>run the script with spec</p>
+<li><p>Go to the test folder</p></li>
+<li><p>Run the script with spec</p>
 
-<pre><code>  rspec demo.rb
+<pre><code> rspec demo.rb
 </code></pre></li>
 </ol>
 
@@ -277,15 +277,14 @@
 <p>To run the script and post result to marquee</p>
 
 <ol>
-<li>go to the root directory</li>
-<li><p>run the script with main.rb. you need provide the test_round_id and browser_type info like below</p>
+<li><p>Go to the root directory</p></li>
+<li><p>Run the script with main.rb. you need provide the test_round_id and browser_type info like below</p>
 
-<pre><code>  ruby main.rb demo "RoundID" "chrome"
+<pre><code> ruby main.rb demo "RoundID" "chrome"
 </code></pre></li>
+<li><p>The result in html format can be found under the test_results folder</p></li>
 </ol>
 
-
-<p>*the result in html format can be found under the test_results folder</p>
 </div>
 
 
