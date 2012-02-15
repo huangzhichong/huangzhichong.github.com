@@ -233,7 +233,7 @@ footer{margin-top:17px;padding-top:17px;border-top:1px solid #eee;}
 .popover .content{background-color:#ffffff;padding:14px;-webkit-border-radius:0 0 3px 3px;-moz-border-radius:0 0 3px 3px;border-radius:0 0 3px 3px;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;}.popover .content p,.popover .content ul,.popover .content ol{margin-bottom:0;}
 
 </style>
-<title>introduction.html</title>
+<title>rselenium.html</title>
 </head>
 <body>
 <h2>Where is the framework</h2>
@@ -299,6 +299,8 @@ end
 
 <pre><code>require "#{File.dirname(__FILE__)}/../common/initialize.rb"
 require "selenium-webdriver"
+require "rspec"
+include RSpec::Expectations
 describe "TestSuiteName" do
     before(:all){
         @driver = Selenium::WebDriver.for $browser.to_sym
@@ -339,8 +341,9 @@ end
 <p>Your codes should looks like below</p>
 
 <pre><code>require "#{File.dirname(__FILE__)}/../common/initialize.rb"
-
 require "selenium-webdriver"
+require "rspec"
+include RSpec::Expectations
 
 describe "TestSuiteName" do
 
