@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+*{margin:0;padding:0;}
+body {
+	font:13.34px helvetica,arial,freesans,clean,sans-serif;
+	color:black;
+	line-height:1.4em;
+	background-color: #F8F8F8;
+	padding: 0.7em;
+}
+p {
+	margin:1em 0;
+	line-height:1.5em;
+}
+table {
+	font-size:inherit;
+	font:100%;
+	margin:1em;
+}
+table th{border-bottom:1px solid #bbb;padding:.2em 1em;}
+table td{border-bottom:1px solid #ddd;padding:.2em 1em;}
+input[type=text],input[type=password],input[type=image],textarea{font:99% helvetica,arial,freesans,sans-serif;}
+select,option{padding:0 .25em;}
+optgroup{margin-top:.5em;}
+pre,code{font:12px Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;}
+pre {
+	margin:1em 0;
+	font-size:12px;
+	background-color:#eee;
+	border:1px solid #ddd;
+	padding:5px;
+	line-height:1.5em;
+	color:#444;
+	overflow:auto;
+	-webkit-box-shadow:rgba(0,0,0,0.07) 0 1px 2px inset;
+	-webkit-border-radius:3px;
+	-moz-border-radius:3px;border-radius:3px;
+}
+pre code {
+	padding:0;
+	font-size:12px;
+	background-color:#eee;
+	border:none;
+}
+code {
+	font-size:12px;
+	background-color:#f8f8ff;
+	color:#444;
+	padding:0 .2em;
+	border:1px solid #dedede;
+}
+img{border:0;max-width:100%;}
+abbr{border-bottom:none;}
+a{color:#4183c4;text-decoration:none;}
+a:hover{text-decoration:underline;}
+a code,a:link code,a:visited code{color:#4183c4;}
+h2,h3{margin:1em 0;}
+h1,h2,h3,h4,h5,h6{border:0;}
+h1{font-size:170%;border-top:4px solid #aaa;padding-top:.5em;margin-top:1.5em;}
+h1:first-child{margin-top:0;padding-top:.25em;border-top:none;}
+h2{font-size:150%;margin-top:1.5em;border-top:4px solid #e0e0e0;padding-top:.5em;}
+h3{margin-top:1em;}
+hr{border:1px solid #ddd;}
+ul{margin:1em 0 1em 2em;}
+ol{margin:1em 0 1em 2em;}
+ul li,ol li{margin-top:.5em;margin-bottom:.5em;}
+ul ul,ul ol,ol ol,ol ul{margin-top:0;margin-bottom:0;}
+blockquote{margin:1em 0;border-left:5px solid #ddd;padding-left:.6em;color:#555;}
+dt{font-weight:bold;margin-left:1em;}
+dd{margin-left:2em;margin-bottom:1em;}
+@media screen and (min-width: 768px) {
+    body {
+        width: 748px;
+        margin:10px auto;
+    }
+}
+</style>
+<title>Marquee</title>
+</head>
+<body>
+<h1>Marquee</h1>
+
+<p><img src="http://www.websequencediagrams.com/cgi-bin/cdraw?lz=CnRpdGxlIE1hcnF1ZWUKCgoKAAQHLT5DbGllbnQ6IHNjaGVkdWxlIGEgdGVzdApub3RlIG92ZXIgABoIcm91bmRfaWQsZW52LGJyb3dzZXIsc2NyaXB0X25hbWUKAEUGAEoJdXBkYXRlIGNvZAARCkF1dG9tYXRpb25TADQFOiBydW4gdGhlIHNwZWNpZmllZCAATQYAewZyaWdodCBvZiAAJxJnZXQgcGFyYW1ldGVycwoAShAAWBRleGVjdXRpbmcAGxMAghUHOiBwb3N0IHJlc3VsdACCHAoAFQlyZXBvcnRpbmcvZW1haWxpbmcK&amp;s=qsd" alt="image" /></p>
+
+<h1>Integration with NUnit in &lsquo;C#&rsquo;</h1>
+
+<h2>Adding 2 files only</h2>
+
+<blockquote><p>EventLisenter.cs</p></blockquote>
+
+<ul>
+<li><p>a custom NUnit addin to override <code>SuiteFinished</code>,<code>SuiteStarted</code> and <code>TestFinished</code></p></li>
+<li><p>require <code>NUnit.Core</code> and <code>NUnit.Core.Extensibility</code></p></li>
+</ul>
+
+
+<blockquote><p>Marquee.cs</p></blockquote>
+
+<ul>
+<li>post xml to marquee for status updating</li>
+</ul>
+
+
+<p><em>Those 2 files can be found under <a href="http://git.dev.activenetwork.com/aw-automation/csharp-selenium">Active&rsquo;s GITORIOUS</a></em></p>
+
+<h2>Parameters</h2>
+
+<p>Parameters are set into system enviroment by Marquee client</p>
+
+<pre><code>*   MarqueeScriptName
+*   MarqueeBrowser
+*   MarqueeRoundID
+*   MarqueeEnvironment
+</code></pre>
+
+<h2>Notice</h2>
+
+<ul>
+<li><p>Name the test with <code>CaseID + '_' + CaseName</code></p>
+
+<pre><code>  [Test]
+  public void Camps1001_TransferFunds()
+  {   }
+</code></pre></li>
+<li><p>If <code>MarqueeRoundID</code> set to <code>DebugMode</code>, it won&rsquo;t send result to marquee.</p></li>
+<li><p>URL of Marquee is hardcode in <code>Marquee.cs</code></p>
+
+<pre><code>  HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://10.109.2.147:3000/status/update");
+</code></pre></li>
+</ul>
+
+
+<h2>TODO</h2>
+
+<ul>
+<li><p>Take snapshot when test fail ? Save images to &ldquo;c:\marquee\screen_shots&rdquo;</p></li>
+<li><p>Integration with CI?</p></li>
+<li><p>Import automation script to marquee ? What is the code structure.</p></li>
+</ul>
+
+</body>
+</html>
