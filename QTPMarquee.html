@@ -1,0 +1,443 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+*{margin:0;padding:0;}
+body {
+	font:13.34px helvetica,arial,freesans,clean,sans-serif;
+	color:black;
+	line-height:1.4em;
+	background-color: #F8F8F8;
+	padding: 0.7em;
+}
+p {
+	margin:1em 0;
+	line-height:1.5em;
+}
+table {
+	font-size:inherit;
+	font:100%;
+	margin:1em;
+}
+table th{border-bottom:1px solid #bbb;padding:.2em 1em;}
+table td{border-bottom:1px solid #ddd;padding:.2em 1em;}
+input[type=text],input[type=password],input[type=image],textarea{font:99% helvetica,arial,freesans,sans-serif;}
+select,option{padding:0 .25em;}
+optgroup{margin-top:.5em;}
+pre,code{font:12px Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;}
+pre {
+	margin:1em 0;
+	font-size:12px;
+	background-color:#eee;
+	border:1px solid #ddd;
+	padding:5px;
+	line-height:1.5em;
+	color:#444;
+	overflow:auto;
+	-webkit-box-shadow:rgba(0,0,0,0.07) 0 1px 2px inset;
+	-webkit-border-radius:3px;
+	-moz-border-radius:3px;border-radius:3px;
+}
+pre code {
+	padding:0;
+	font-size:12px;
+	background-color:#eee;
+	border:none;
+}
+code {
+	font-size:12px;
+	background-color:#f8f8ff;
+	color:#444;
+	padding:0 .2em;
+	border:1px solid #dedede;
+}
+img{border:0;max-width:100%;}
+abbr{border-bottom:none;}
+a{color:#4183c4;text-decoration:none;}
+a:hover{text-decoration:underline;}
+a code,a:link code,a:visited code{color:#4183c4;}
+h2,h3{margin:1em 0;}
+h1,h2,h3,h4,h5,h6{border:0;}
+h1{font-size:170%;border-top:4px solid #aaa;padding-top:.5em;margin-top:1.5em;}
+h1:first-child{margin-top:0;padding-top:.25em;border-top:none;}
+h2{font-size:150%;margin-top:1.5em;border-top:4px solid #e0e0e0;padding-top:.5em;}
+h3{margin-top:1em;}
+hr{border:1px solid #ddd;}
+ul{margin:1em 0 1em 2em;}
+ol{margin:1em 0 1em 2em;}
+ul li,ol li{margin-top:.5em;margin-bottom:.5em;}
+ul ul,ul ol,ol ol,ol ul{margin-top:0;margin-bottom:0;}
+blockquote{margin:1em 0;border-left:5px solid #ddd;padding-left:.6em;color:#555;}
+dt{font-weight:bold;margin-left:1em;}
+dd{margin-left:2em;margin-bottom:1em;}
+@media screen and (min-width: 768px) {
+    body {
+        width: 748px;
+        margin:10px auto;
+    }
+}
+</style>
+<title>Integrate QTP automation to Marquee</title>
+</head>
+<body>
+<h1>Integrate QTP automation to Marquee</h1>
+
+<h2>Steps</h2>
+
+<ol>
+<li><p>import <code>marquee.vbs</code> to your QTP test.</p></li>
+<li><p>add below columns into the Global datatable</p>
+
+<p>  <code>BuildNumber</code> &mdash; marquee will writh the test round id here</p>
+
+<p>  <code>AUT_ENV</code> &mdash; marquee will write the test environment here</p>
+
+<p>  <code>status</code> &mdash; identify if a test passed or failed</p>
+
+<p>  <code>ErrorMsg</code> &mdash; error message get in a test case</p>
+
+<p>  <code>Snapshot</code> &mdash; snapshots name captured in a test case</p></li>
+<li><p>add function call in the start of first action</p>
+
+<pre><code>  'the Datatable("Services",dtGlobalSheet) is optional, can leave it blank
+  Upload_Automation_Status Datatable("BuildNumber",dtGlobalSheet),Environment("TestName"),Datatable("Services",dtGlobalSheet),"Start" 
+</code></pre></li>
+<li><p>add function call at the end of last action</p>
+
+<pre><code>  Upload_Automation_Status Datatable("BuildNumber",dtGlobalSheet),Environment("TestName"),"","End"
+</code></pre></li>
+<li><p>call below functions at end of each test case</p>
+
+<pre><code>  'SPORTS8353 is the value of test case id
+  Add_TestCase_To_TestPlan "SPORTS8353", DataTable("Status", dtGlobalSheet), DataTable("ErrorMsg", dtGlobalSheet), DataTable("SnapShot", dtGlobalSheet)
+</code></pre></li>
+<li><p>replace the <code>Reporter.ReportEvent</code> with <code>Check_Result</code> in all your checkpoints.</p>
+
+<p>  this method will take care of taking snapsshot when case fail and write error meessage to datatable</p></li>
+</ol>
+
+
+<h2>marquee.vbs</h2>
+
+<pre><code>'**********************************************************************************************************
+'Eric Yang 12/23/2010 created
+' Send XML object to AutomationDashboard webservice. 
+'
+' objXMLDoc: The xml object to be sent.
+' strWSUrl: The URL of the specified WebService
+'**********************************************************************************************************
+Function Send_XML_To_WS(objXMLDoc, strWSUrl)
+    Dim httpRequest
+    Set httpRequest = CreateObject("Microsoft.XMLHTTP")
+    With httpRequest
+        .open "POST",strWSUrl, False
+        .setRequestHeader "Content-Type", "text/xml"
+        .send(objXMLDoc)
+    End With
+    Set httpRequest = Nothing
+End Function
+
+'---------------------------------------Operation of XML----------------------------------------------------
+
+'**********************************************************************************************************
+'Eric Yang 12/23/2010 created
+' Create an element. 
+'
+' objElement: The element object  created.
+' objXMLDoc: The XML DOM object .
+' strElementName: The tag name of  the element .
+'**********************************************************************************************************
+Function Create_Element(byref objElement, objXMLDoc, strElementName)
+    Set objElement = objXMLDoc.createElement(strElementName)
+End Function
+
+'**********************************************************************************************************
+'Eric Yang 12/23/2010 created
+' Create a text node. 
+'
+' objTextNode: The text node object  created.
+' objXMLDoc: The XML DOM object .
+' strTextNodeValue: The value of  the text node .
+'**********************************************************************************************************
+Function Create_TextNode(byref objTextNode, objXMLDoc, strTextNodeValue)
+    Set objTextNode = objXMLDoc.createTextNode(strTextNodeValue)
+End Function
+
+'**********************************************************************************************************
+'Eric Yang 12/23/2010 created
+' Appaned an attribute to a pecified  element. 
+'
+' objElement: The element object  to be appended attribute.
+' strAttributeName: Attribute name.
+' strAttributeValue:  Attribute Value.
+'**********************************************************************************************************
+Function Append_Attribute(objElement, strAttributeName, strAttributeValue)
+    objElement.setAttribute strAttributeName, strAttributeValue
+End Function
+
+'**********************************************************************************************************
+'Eric Yang 12/23/2010 created
+' Appaned an child element to a pecified  element. 
+'
+' objParentElement: The parent element .
+' objChildElement: The child element.
+'**********************************************************************************************************
+Function Append_ChildElement(objParentElement, objChildElement)
+    objParentElement.appendChild(objChildElement)
+End Function
+
+'**********************************************************************************************************
+'Eric Yang 12/23/2010 created
+' Find elements by tag name. Return an object of  elements array.
+'
+' objXMLDoc: The XML DOM object .
+' strTagName: The element tag name to search with.
+' objArrayElements:  The object of elements array to be returned.
+'**********************************************************************************************************
+Function Find_Elements_By_TagName(objXMLDoc, strTagName, byref objArrayElements)
+    Set objArrayElements = objXMLDoc.selectNodes("//"&amp;strTagName)
+End Function
+
+'**********************************************************************************************************
+'Eric Yang 12/23/2010 created
+' Find element by tag name. Return an unique object of element.
+'
+' objXMLDoc: The XML DOM object .
+' strTagName: The element tag name to search with.
+' objElement: The element object  to be returned.
+'**********************************************************************************************************
+Function Find_Element_By_TagName(objXMLDoc, strTagName, byref objElement)
+    Dim oNodes
+    Set oNodes = objXMLDoc.selectNodes("//"&amp;strTagName)
+    Set objElement = oNodes(0)
+    Set oNodes = Nothing
+End Function
+
+
+'**********************************************************************************************************
+'Eric Yang 12/23/2010 created
+' Create an XML DOM object. 
+'
+' objXMLDoc: The XML DOM object  created.
+'**********************************************************************************************************
+Function Create_XMLDoc(byref objXMLDoc)
+    Set objXMLDoc = CreateObject("Microsoft.XMLDOM") '创建XML DOM对象
+End Function
+
+
+
+
+Function Upload_Automation_Status(round_id, script_name, services,state)
+    Dim start_status_xml, protocol_ele, what_ele, what_node, round_ele, round_node, data_ele, start_time_ele, start_time_node, end_time_ele, end_time_node, script_name_ele, script_name_node, state_ele, state_node, service_ele, service_name_ele, service_name_node, service_version_ele, service_version_node
+    Create_XMLDoc start_status_xml
+    Create_Element protocol_ele, start_status_xml, "protocol"
+
+    Create_Element what_ele, start_status_xml, "what"
+    Create_TextNode what_node, start_status_xml, "Script"
+    Append_ChildElement what_ele, what_node
+    Append_ChildElement protocol_ele, what_ele
+
+    Create_Element round_ele, start_status_xml, "round_id"
+    Create_TextNode round_node, start_status_xml, Trim(round_id)
+    Append_ChildElement round_ele, round_node
+    Append_ChildElement protocol_ele, round_ele
+
+    Create_Element data_ele, start_status_xml, "data"
+
+    Create_Element start_time_ele, start_status_xml, "start_time"
+    Create_TextNode start_time_node, start_status_xml, getCurrentTime
+    Append_ChildElement start_time_ele, start_time_node
+    Append_ChildElement data_ele, start_time_ele
+
+    Create_Element end_time_ele, start_status_xml, "end_time"
+    Create_TextNode end_time_node, start_status_xml, getCurrentTime
+    Append_ChildElement end_time_ele, end_time_node
+    Append_ChildElement data_ele, end_time_ele
+
+    Create_Element state_ele, start_status_xml, "state"
+    Create_TextNode state_node, start_status_xml, LCase(Trim(state))
+    Append_ChildElement state_ele, state_node
+    Append_ChildElement data_ele, state_ele
+
+    Create_Element script_name_ele, start_status_xml, "script_name"
+    Create_TextNode script_name_node, start_status_xml, Trim(script_name)
+    Append_ChildElement script_name_ele, script_name_node
+    Append_ChildElement data_ele, script_name_ele
+
+
+    If services &lt;&gt;"" Then
+        arrayServiceInfo = Split(services,"|")
+        For Each strServiceInfo In arrayServiceInfo
+            arrayServiceDetails = Split(strServiceInfo,"#")
+            Create_Element service_ele, start_status_xml, "service"
+
+            Create_Element service_name_ele, start_status_xml, "name"
+            Create_TextNode service_name_node, start_status_xml, arrayServiceDetails(0)
+            Append_ChildElement service_name_ele, service_name_node
+            Append_ChildElement service_ele, service_name_ele
+
+            Create_Element service_version_ele, start_status_xml, "version"
+            Create_TextNode service_version_node, start_status_xml, arrayServiceDetails(1)
+            Append_ChildElement service_version_ele, service_version_node
+            Append_ChildElement service_ele, service_version_ele
+            Append_ChildElement data_ele, service_ele
+        Next
+    End If
+
+
+    Append_ChildElement protocol_ele, data_ele
+    Append_ChildElement start_status_xml, protocol_ele
+    Dim strWSUrl
+    strWSUrl = Get_Status_Update_WS_URL
+    Send_XML_To_WS start_status_xml,strWSUrl
+
+    Set start_status_xml = Nothing
+    Set strWSUrl = Nothing
+
+End Function
+
+Function Upload_Case_Result(round_id, script_name, case_id, result, error_msg, screenshot)
+    Dim start_status_xml, protocol_ele, what_ele, what_node, round_ele, round_node, data_ele, case_id_ele, case_id_node, result_ele, result_node, script_name_ele, script_name_node, error_msg_ele, error_msg_node, screenshot_ele, screenshot_node
+    Create_XMLDoc start_status_xml
+    Create_Element protocol_ele, start_status_xml, "protocol"
+
+    Create_Element what_ele, start_status_xml, "what"
+    Create_TextNode what_node, start_status_xml, "Case"
+    Append_ChildElement what_ele, what_node
+    Append_ChildElement protocol_ele, what_ele
+
+    Create_Element round_ele, start_status_xml, "round_id"
+    Create_TextNode round_node, start_status_xml, Trim(round_id)
+    Append_ChildElement round_ele, round_node
+    Append_ChildElement protocol_ele, round_ele
+
+    Create_Element data_ele, start_status_xml, "data"
+
+    Create_Element case_id_ele, start_status_xml, "case_id"
+    Create_TextNode case_id_node, start_status_xml, case_id
+    Append_ChildElement case_id_ele, case_id_node
+    Append_ChildElement data_ele, case_id_ele
+
+    Create_Element result_ele, start_status_xml, "result"
+    Create_TextNode result_node, start_status_xml,  LCase(Trim(result))
+    Append_ChildElement result_ele, result_node
+    Append_ChildElement data_ele, result_ele
+
+    Create_Element error_msg_ele, start_status_xml, "error"
+    Create_TextNode error_msg_node, start_status_xml, Trim(error_msg)
+    Append_ChildElement error_msg_ele, error_msg_node
+    Append_ChildElement data_ele, error_msg_ele
+
+    Create_Element screenshot_ele, start_status_xml, "screen_shot"
+    Create_TextNode screenshot_node, start_status_xml, screenshot
+    Append_ChildElement screenshot_ele, screenshot_node
+    Append_ChildElement data_ele, screenshot_ele
+
+    Create_Element script_name_ele, start_status_xml, "script_name"
+    Create_TextNode script_name_node, start_status_xml, Trim(script_name)
+    Append_ChildElement script_name_ele, script_name_node
+    Append_ChildElement data_ele, script_name_ele
+
+    Append_ChildElement protocol_ele, data_ele
+    Append_ChildElement start_status_xml, protocol_ele
+
+    Dim strWSUrl
+    strWSUrl = Get_Status_Update_WS_URL
+    Send_XML_To_WS start_status_xml,strWSUrl
+
+    Set start_status_xml = Nothing
+    Set strWSUrl = Nothing
+
+End Function
+
+'Get the version of gavin services, and return it as String
+'Return the reuslt of each service
+'The result is formated as below
+'FndWebserverCamps#2.5.0.7|CampsSessionManagementService#2.5.0.4|OrderSerivice#None
+Function Get_Service_Version_String(strAUT_ENV,strServices)
+    Dim sUrl,h,result,j,i,arr
+    Select Case strAUT_ENV
+        Case "INT"
+        strAUT_ENV = "INT-Latest"
+        Case "INTR"
+        strAUT_ENV = "INT-Released"
+        Case "QA"
+        strAUT_ENV = "QA-Latest"
+        Case "QAR"
+        strAUT_ENV = "Regression"
+        Case "QAS"
+        strAUT_ENV = "Staging"
+    End Select
+    Get_Service_Version_String = ""
+    sUrl = "http://arm.dev.activenetwork.com/ActiveDeploy/CompareHandle"
+    Set h = CreateObject("Microsoft.XMLHTTP")
+    h.open "POST",sUrl, False
+    h.setRequestHeader "Content-Type","application/x-www-form-urlencoded"
+    h.send "env1="&amp;strAUT_ENV&amp;"&amp;env2="&amp;strAUT_ENV
+    If h.Status=200 Then
+        arrResponse= Split(h.responseText,"&lt;/a&gt;&lt;p&gt;")
+        arrayService = Split(strServices,"#")
+        lenResponse =  UBound(arrResponse)
+        lenService = UBound(arrayService)
+        result=""
+        For j= 0 To lenService
+            For i=0 To lenResponse              
+                If InStr(arrResponse(i),arrayService(j)) Then
+                    result = result&amp;arrayService(j)&amp;"#"&amp;Trim(Split(arrResponse(i)," to ")(1))&amp;"|"
+                    Exit For
+                End If
+                If i = lenResponse Then
+                    result = result&amp;arrayService(j)&amp;"#None|"
+                End If
+            Next            
+            'Return the reuslt of each service
+            'The result is formated as below
+            'FndWebserverCamps#2.5.0.7|CampsSessionManagementService#2.5.0.4|OrderSerivice#None
+            If j=  lenService Then
+                result = Left(result,(Len(result)-1))
+                Get_Service_Version_String = result
+                Exit Function
+            End If  
+        Next
+    Else
+        Check_Result 1,"Get_Service_Version_String", "Get ervice return object from dashboard failed" 
+    End If
+    Set h = Nothing : Set sUrl = Nothing
+End Function
+
+'Get the service version for Camps project
+Function Get_Service_Return_Object_from_Dashboard(strAUT_ENV)
+    Get_Service_Return_Object_from_Dashboard =Get_Service_Version_String  (strAUT_ENV,"FndWebserverCamps#CampsSessionManagementService#FndWebserverCui")
+End Function
+
+Function Get_Status_Update_WS_URL
+    Get_Status_Update_WS_URL = "http://marquee.dev.activenetwork.com/status/update"
+End Function
+
+Function Add_TestCase_To_TestPlan(strTcId, strResult, strErrorMsg, strMsgUrl)
+Upload_Case_Result Datatable("BuildNumber",dtGlobalSheet), Environment("TestName"), strTcId, strResult, strErrorMsg, strMsgUrl
+DataTable("Status", dtGlobalSheet)="pass"
+DataTable("ErrorMsg", dtGlobalSheet) =""
+DataTable("SnapShot", dtGlobalSheet) = ""
+End Function
+
+Public Function Check_Result(intFlag,strDescription,strDetail)
+    Select Case intFlag
+        Case 1
+        If DataTable("Status",dtGlobalSheet)="pass"  Then                    
+            DataTable.Value("Status",dtGlobalSheet)="failed"
+        End If
+        DataTable("ErrorMsg",dtGlobalSheet)=DataTable("ErrorMsg",dtGlobalSheet)&amp;vbCr &amp;"Description -- " &amp; strDescription &amp;vbCr &amp; "ErrorMsg -- "&amp;strDetail 
+        Dim strSnapShotURL : strSnapShotURL = "C:\marquee\snapshots\"&amp;strDescription &amp;TimeStamp&amp;".png"
+        DataTable("SnapShot",dtGlobalSheet)=DataTable("SnapShot",dtGlobalSheet)&amp;vbCr&amp;strSnapShotURL
+        Desktop.CaptureBitmap strSnapShotURL,True
+        Reporter.ReportEvent 1,strDescription, strDetail
+        Case Else
+        Reporter.ReportEvent intFlag,strDescription, strDetail
+    End Select
+    Set strSnapShotURL = Nothing
+End Function
+</code></pre>
+</body>
+</html>
