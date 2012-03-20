@@ -93,7 +93,7 @@ dd{margin-left:2em;margin-bottom:1em;}
 
 <ul>
 <li><p>a custom NUnit addin to override <code>SuiteFinished</code>,<code>SuiteStarted</code> and <code>TestFinished</code></p></li>
-<li><p>require <code>NUnit.Core</code> and <code>NUnit.Core.Extensibility</code></p></li>
+<li><p>require <code>nunit.core.dll</code> and <code>nunit.core.interfaces.dll</code></p></li>
 </ul>
 
 
@@ -111,8 +111,8 @@ dd{margin-left:2em;margin-bottom:1em;}
 <p>Parameters are set into system enviroment by Marquee client</p>
 
 <pre><code>*   MarqueeScriptName
-*   MarqueeBrowser
 *   MarqueeRoundID
+*   MarqueeBrowser  
 *   MarqueeEnvironment
 </code></pre>
 
@@ -133,12 +133,46 @@ dd{margin-left:2em;margin-bottom:1em;}
 </ul>
 
 
+<h2>Upload script to <a href="http://marquee.dev.activenetwork.com">Marquee</a></h2>
+
+<ul>
+<li><p>a ruby script is used to upload the scripts' information</p>
+
+<p>  have corresponding test plan/case</p>
+
+<pre><code>  ruby parseCSharpCode.rb
+</code></pre>
+
+<p>  have no test plan/case</p>
+
+<pre><code>  ruby parseCSharpCode_without_tp.rb
+</code></pre></li>
+</ul>
+
+
+<p><em>the scripts can be found <a href="http://git.dev.activenetwork.com/aw-automation/csharp-selenium/trees/master/MarqueeDemo">here</a></em></p>
+
+<ul>
+<li><p>a <code>[TextFixture]</code> will be treat as a test script.</p></li>
+<li><p>the name of test script is exactally the same as the name space of <code>[TextFixture]</code></p></li>
+</ul>
+
+
+<h2>Execute the script</h2>
+
+<ul>
+<li><p>NUnit test is executed via command line in Marquee&rsquo;s slave</p>
+
+<pre><code>  nunit-console testscript.dll /fixture:NAMESPACE.FixtureName
+</code></pre></li>
+</ul>
+
+
 <h2>TODO</h2>
 
 <ul>
 <li><p>Take snapshot when test fail ? Save images to &ldquo;c:\marquee\screen_shots&rdquo;</p></li>
 <li><p>Integration with CI?</p></li>
-<li><p>Import automation script to marquee ? What is the code structure.</p></li>
 </ul>
 
 </body>
